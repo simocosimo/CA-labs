@@ -80,4 +80,5 @@ daddui r2, r2, 8
 j checkloop
 
 end:
+nop
 halt
