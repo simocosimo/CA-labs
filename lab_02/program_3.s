@@ -1,5 +1,4 @@
 .data
-z:  .double 0.0
 ba: .double 0xab
 e:  .word16 0x7ff
 i:  .double -5, 32.3, 42.3, -17, 42.65, -1, 56.45, 6.54, -3, 045.45, -5, 4.34
@@ -24,19 +23,11 @@ y:  .space 8
 ;f6 -> temp y value
 ;r7 -> exponent check
 
-daddui r1, r0, 240
-daddui r2, r0, 0
-daddui r4, r0, 0
-l.d f0, z(r0)
 l.d f5, ba(r0)
 lh r7, e(r0)
-dsll r7, r7, 31
-dsll r7, r7, 21
-add.d f1, f0, f0
-add.d f2, f0, f0
-add.d f3, f0, f0
-add.d f4, f0, f0
-add.d f6, f0, f0
+daddui r5, r0, 52
+daddui r1, r0, 240
+dsllv r7, r7, r5
 
 checkloop:
 beq r2, r1, fx
