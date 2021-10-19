@@ -1,5 +1,5 @@
 .data
-ba: .double 0xab
+ba: .byte 0xab
 e:  .word16 0x7ff
 i:  .double -5, 32.3, 42.3, -17, 42.65, -1, 56.45, 6.54, -3, 045.45, -5, 4.34
     .double 0.34, 1.7, -34.3, -1, 0.54, -34, 3, -65, -5, 454.3, 43.5, -1.7
@@ -17,16 +17,19 @@ y:  .space 8
 ;f1 -> temp value from i
 ;f2 -> temp value from w
 ;f3 -> temp i * w
+;r3 -> ba
 ;f4 -> x
 ;r4 -> int of f4, support
-;f5 -> ba
+;f5 -> float correct ba
 ;f6 -> temp y value
 ;r7 -> exponent check
 
-l.d f5, ba(r0)
+ld r3, ba(r0)
 lh r7, e(r0)
 daddui r5, r0, 52
+mtc1 r3, f5
 daddui r1, r0, 240
+cvt.d.l f5, f5
 dsllv r7, r7, r5
 
 checkloop:
