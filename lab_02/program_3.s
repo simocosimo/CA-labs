@@ -46,8 +46,7 @@ daddui r2, r2, 8
 j checkloop
 
 fx:
-;adding b to the whole summation
-;TODO: check if b is a fp or an int with prof
+;adding bias to the whole summation
 add.d f4, f4, f5
 mfc1 r4, f4
 and r4, r4, r7
