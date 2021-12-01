@@ -7,4 +7,4 @@ Laboratories from the Computer Architectures course @ PoliTo
 - [Lab_04](https://github.com/simocosimo/CA-labs/tree/main/lab_04) - 28/10/2021 (Delivered: 29/10/2021)
 - [Lab_05](https://github.com/simocosimo/CA-labs/tree/main/lab_05) - 04/11/2021 (Delivered: 10/11/2021)
 - [Lab_06](https://github.com/simocosimo/CA-labs/tree/main/lab_06) - 18/11/2021 (Delivered: 22/11/2021)
-- [Lab_07](https://github.com/simocosimo/CA-labs/tree/main/lab_07) - 25/11/2021
+- [Lab_07](https://github.com/simocosimo/CA-labs/tree/main/lab_07) - 25/11/2021 (Delivered: 01/12/2021)
