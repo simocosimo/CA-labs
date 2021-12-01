@@ -39,14 +39,27 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x00000000
+Heap_Size       EQU     0x00000200
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
+total_tickets	DCD		0			;space reserved for the total_tickets variable
+Sector_uqty
 Heap_Mem        SPACE   Heap_Size
 __heap_limit
 
+				; Readonly area with sector infos
+				AREA	SECTORINFO, DATA, READONLY
+Sector_prices	DCD 0x01, 25, 0x02, 40, 0x03, 55, 0x04, 65, 0x05, 80, 0x06, 110
+Sector_quantity DCD 0x02, 250, 0x05, 250, 0x03, 550, 0x01, 150, 0x04, 100, 0x06, 200
+Num_sectors		DCB 6
 
+
+				; Readonly area with sector infos
+				AREA	TICKETREQUEST, DATA, READONLY
+Tickets			DCD 0x05, 2, 0x03, 10, 0x01, 120
+Ticket_requests DCD 3
+	
                 PRESERVE8
                 THUMB
 
@@ -126,31 +139,95 @@ Reset_Handler   PROC
                 EXPORT  Reset_Handler             [WEAK]                                            
                 LDR     R0, =Reset_Handler
 				
-				; your code here
-				LDR R0, =0x00000055
-				LDR R1, =0x00000049
+				; your code here				
+				BL 		initCopy
 				
-				LDR R8, =0x00000020
-				LDR R9, =0x00000400
+				LDR		R2, =Sector_uqty
+				LDR		R3, =Sector_prices
+				LDR		R6, =Tickets
+				LDR		R7, =Ticket_requests
+				LDR		R7, [R7]
+				LDR 	R10, =total_tickets
+				MOV		R12, #0
+				MOV		R8, #0
+				MOV		R9, #0
 				
-				EOR R3, R0, R1
+reqLoop			LDR		R4, [R6]
+				MOV		R1, R2
+				BL		subGet			;qty result in R5
+				LDR 	R8, [R6, #4]	;take qty from request
+				ADD		R9, R9, R8
+				MOV		R11, R8			;store the qty for later
+				SUBS	R8, R5, R8		;sub them to check avilability
+				MOVLT  	R12, #0
+				MOVLT	R11, #0x01
+				BLT		finalSet		;if not ok, jump to end and set registers
+				BL		subGet			;update array
 				
-				CMP R3, #0
-				BEQ part_2
-loop			TST R3, #1
-				ADDNE R2, R2, #1
-				LSRS R3, #1
-				BNE loop
+				MOV 	R1, R3
+				MOV		R8, #0
+				BL		subGet			;price result in R5
+				MUL		R11, R5, R11	;mul qty * price
+				ADD		R12, R12, R11	;save to register
 				
-part_2			EOR R7, R2, #1
-				CMP R7, R2
-				MRSLT R1, APSR
-				ORRGT R1, R1, R8
-				ANDGT R0, R0, R9
-
-p_end           B	.	;BX      R0
+				ADD		R6, R6, #8		;update index
+				ADD		R2, R2, #8
+				SUBS	R7, R7, #1		;loop
+				MOVEQ	R11, #0
+				BEQ		finalSet
+				B		reqLoop
+				
+finalSet		CMP		R9, #0xA
+				ASRGT	R12, #1			;50% discount if #ticket > 10
+				STR 	R12, [R10]		;save into memory the tot cost
+end_p			BX      R0
                 ENDP
 
+; Routine to get value from array or to update the quantity array
+; If R8 is not set: get value from array
+; If R8 is set: update the value in the array
+subGet			PROC	
+				PUSH 	{R2, R3, LR}			;R4 set from outside, the target value
+				LDR 	R2, =Num_sectors
+				LDR 	R2, [R2]
+				LSL		R2, #3					;*8 to get the stop index
+				
+				LDR 	R3, [R1]				;get first quantity
+loop			CMP		R3, R4
+				CMPEQ	R8, #0
+				LDREQ	R5, [R1, #4]			;save result in R5
+				BEQ		end_s
+				CMPNE	R3, R4
+				STREQ	R8, [R1, #4]
+				BEQ		end_s
+
+				LDR		R3, [R1, #8]!
+				CMP		R2, R1
+				BNE		loop
+				
+				MOV		R5, #0					;if a value couldn't be found R5 = 0
+end_s			POP 	{R2, R3, PC}
+				ENDP
+
+; Routine for starting copy of ROM into RAM (quantity)
+initCopy		PROC
+				STMDB	SP!, {R1-R4, LR}
+				LDR		R1, =Sector_quantity
+				LDR 	R2, =Num_sectors
+				LDR		R2, [R2]
+				LSL		R2, #1
+				LDR		R3, =Sector_uqty
+				
+				LDR		R4, [R1]
+				STR		R4, [R3]
+copyLopp		SUBS	R2, R2, #1
+				BEQ		endInitCopy
+				LDR		R4, [R1, #4]!
+				STR		R4, [R3, #4]!
+				B		copyLopp
+				
+endInitCopy		LDMIA	SP!, {R1-R4, PC}
+				ENDP
 
 ; Dummy Exception Handlers (infinite loops which can be modified)
 
@@ -282,6 +359,8 @@ CANActivity_IRQHandler
 
                 EXPORT  __initial_sp
                 EXPORT  __heap_base
-                EXPORT  __heap_limit                
+                EXPORT  __heap_limit  
+				;EXPORT  __sinfo_base
+				;EXPORT  __sinfo_limit
 
                 END

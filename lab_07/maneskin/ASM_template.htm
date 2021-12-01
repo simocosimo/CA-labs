@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\ASM_template.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\ASM_template.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sat Nov 20 12:33:18 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Tue Nov 30 17:33:46 2021
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -77,7 +77,10 @@ Function Pointers
 <H3>
 Global Symbols
 </H3>
-<P><STRONG><a name="[2d]"></a>Reset_Handler</STRONG> (Thumb, 62 bytes, Stack size 0 bytes, startup.o(.text))
+<P><STRONG><a name="[2d]"></a>Reset_Handler</STRONG> (Thumb, 120 bytes, Stack size 0 bytes, startup.o(.text))
+<BR><BR>[Calls]<UL><LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initCopy
+<LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;subGet
+</UL>
 
 <P><STRONG><a name="[1]"></a>NMI_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, startup.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NMI_Handler
@@ -253,7 +256,15 @@ Global Symbols
 </UL><P>
 <H3>
 Local Symbols
-</H3><P>
+</H3>
+<P><STRONG><a name="[2e]"></a>subGet</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, startup.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
+</UL>
+
+<P><STRONG><a name="[2f]"></a>initCopy</STRONG> (Thumb, 34 bytes, Stack size 0 bytes, startup.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Reset_Handler
+</UL>
+<P>
 <H3>
 Undefined Global Symbols
 </H3><HR></body></html>
